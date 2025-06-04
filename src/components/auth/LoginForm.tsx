@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { handleFirebaseError } from "@/hooks/use-firebase";
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -60,25 +61,7 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
             onSuccess?.();
         } catch (error: any) {
             console.error("Login error:", error);
-            let errorMessage = "Login failed";
-
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    errorMessage = "No account found with this email";
-                    break;
-                case 'auth/wrong-password':
-                    errorMessage = "Incorrect password";
-                    break;
-                case 'auth/invalid-email':
-                    errorMessage = "Invalid email address";
-                    break;
-                case 'auth/user-disabled':
-                    errorMessage = "This account has been disabled";
-                    break;
-                default:
-                    errorMessage = error.message || "Login failed";
-            }
-
+            const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
         } finally {
             setIsLoading(false);
@@ -95,7 +78,7 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
             onSuccess?.();
         } catch (error: any) {
             console.error("Google sign-in error:", error);
-            const errorMessage = error.message || "Google sign-in failed";
+            const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
         } finally {
             setIsLoading(false);

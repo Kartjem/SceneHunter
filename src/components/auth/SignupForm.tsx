@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { IconBrandGoogle } from "@tabler/icons-react";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { handleFirebaseError } from "@/hooks/use-firebase";
 
 interface SignupFormProps {
     onSuccess?: () => void;
@@ -75,7 +76,7 @@ export function SignupForm({ onSuccess, onError }: SignupFormProps) {
             onSuccess?.();
         } catch (error: any) {
             console.error("Registration error:", error);
-            const errorMessage = error.message || "Registration failed";
+            const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
         } finally {
             setIsLoading(false);
@@ -92,7 +93,7 @@ export function SignupForm({ onSuccess, onError }: SignupFormProps) {
             onSuccess?.();
         } catch (error: any) {
             console.error("Google sign-in error:", error);
-            const errorMessage = error.message || "Google sign-in failed";
+            const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
         } finally {
             setIsLoading(false);

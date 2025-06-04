@@ -152,3 +152,5 @@ package-lock.json
 
 apphosting.local.yaml
 node_modules
+# Sentry Config File
+.env.sentry-build-plugin
