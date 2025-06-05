@@ -31,8 +31,8 @@ export default function HomePage() {
             <div className="flex items-center justify-center min-h-screen px-4 pt-20">
                 <div className="text-center relative z-10 max-w-5xl mx-auto">
                     <div className="mb-12 animate-fade-in-up">
-                        <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
-                            <span className="bg-apple-blue bg-clip-text text-transparent">Welcome to</span>
+                        <h1 className="pt-10 text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+                            <span className="bg-apple-blue bg-clip-text text-transparent">Welcome to </span>
                             <br />
                             <span className="text-foreground">SceneHunter</span>
                         </h1>
