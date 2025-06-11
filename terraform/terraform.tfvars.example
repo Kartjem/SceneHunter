@@ -1,0 +1,32 @@
+# Example terraform.tfvars file for SceneHunter V2
+# Copy this file to terraform.tfvars and update with your actual values
+
+# Project Configuration
+project_id   = "scenehunter-29ff8"
+project_name = "scenehunter"
+environment  = "dev"
+
+# GCP Region and Zone
+region = "europe-west1"
+zone   = "europe-west1-b"
+
+# Billing Account ID (required for new projects)
+# billing_account = "XXXXXX-XXXXXX-XXXXXX"
+
+# Network Configuration
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidr   = "10.0.1.0/24"
+private_subnet_cidr  = "10.0.2.0/24"
+db_subnet_cidr       = "10.0.3.0/24"
+
+# Firebase Configuration
+firebase_project_id = "scenehunter-29ff8"
+
+# CORS Origins for Storage Buckets
+allowed_cors_origins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://scenehunter-29ff8.web.app",
+  "https://scenehunter-29ff8.firebaseapp.com"
+]
+
