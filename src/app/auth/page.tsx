@@ -16,7 +16,6 @@ export default function AuthPage() {
         setError("");
         setSuccess(isLogin ? "Successfully logged in!" : "Account created successfully!");
 
-        // Redirect to home page after successful auth
         setTimeout(() => {
             router.push("/");
         }, 1500);
@@ -25,12 +24,6 @@ export default function AuthPage() {
     const handleError = (errorMessage: string) => {
         setSuccess("");
         setError(errorMessage);
-    };
-
-    const toggleMode = () => {
-        setIsLogin(!isLogin);
-        setError("");
-        setSuccess("");
     };
 
     return (
@@ -85,8 +78,8 @@ export default function AuthPage() {
                                     <button
                                         onClick={() => setIsLogin(true)}
                                         className={`text-sm font-medium rounded-xl px-4 py-3 transition-all duration-300 ${isLogin
-                                                ? 'bg-apple-blue text-white shadow-lg'
-                                                : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
+                                            ? 'bg-apple-blue text-white shadow-lg'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
                                             }`}
                                     >
                                         Sign In
@@ -94,8 +87,8 @@ export default function AuthPage() {
                                     <button
                                         onClick={() => setIsLogin(false)}
                                         className={`text-sm font-medium rounded-xl px-4 py-3 transition-all duration-300 ${!isLogin
-                                                ? 'bg-apple-blue text-white shadow-lg'
-                                                : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
+                                            ? 'bg-apple-blue text-white shadow-lg'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
                                             }`}
                                     >
                                         Sign Up

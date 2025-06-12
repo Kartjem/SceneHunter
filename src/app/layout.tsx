@@ -3,7 +3,7 @@ import { ThemeProvider } from '@/hooks/use-theme';
 import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-  title: 'SceneHunter V2',
+  title: 'SceneHunter',
   description: 'Discover amazing filming locations around the world',
   keywords: ['filming locations', 'movies', 'travel', 'photography', 'scenes'],
   authors: [{ name: 'SceneHunter Team' }],

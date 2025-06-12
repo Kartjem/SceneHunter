@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
-// Simple auth state hook
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -21,9 +20,9 @@ export function useAuth() {
     return { user, loading };
 }
 
-// Simple error handler
-export function handleFirebaseError(error: any): string {
-    switch (error.code) {
+export function handleFirebaseError(error: unknown): string {
+    const firebaseError = error as { code?: string; message?: string };
+    switch (firebaseError.code) {
         case 'auth/user-not-found':
             return 'No account found with this email';
         case 'auth/wrong-password':
@@ -39,6 +38,6 @@ export function handleFirebaseError(error: any): string {
         case 'not-found':
             return 'Data not found';
         default:
-            return error.message || 'An error occurred';
+            return firebaseError.message || 'An error occurred';
     }
 }

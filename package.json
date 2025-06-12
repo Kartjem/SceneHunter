@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.7",
+    "@sentry/nextjs": "^9.28.1",
     "@tabler/icons-react": "^3.33.0",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^11.8.1",
+    "lru-cache": "^11.1.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
     "react": "^18",

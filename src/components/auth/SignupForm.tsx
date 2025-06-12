@@ -74,7 +74,7 @@ export function SignupForm({ onSuccess, onError }: SignupFormProps) {
 
             console.log("User created successfully:", userCredential.user);
             onSuccess?.();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Registration error:", error);
             const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
@@ -91,7 +91,7 @@ export function SignupForm({ onSuccess, onError }: SignupFormProps) {
             const result = await signInWithPopup(auth, provider);
             console.log("Google sign-in successful:", result.user);
             onSuccess?.();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Google sign-in error:", error);
             const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
@@ -107,7 +107,6 @@ export function SignupForm({ onSuccess, onError }: SignupFormProps) {
             [name]: value
         }));
 
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,

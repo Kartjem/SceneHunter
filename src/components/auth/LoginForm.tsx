@@ -59,7 +59,7 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
 
             console.log("User logged in successfully:", userCredential.user);
             onSuccess?.();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Login error:", error);
             const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
@@ -76,7 +76,7 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
             const result = await signInWithPopup(auth, provider);
             console.log("Google sign-in successful:", result.user);
             onSuccess?.();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Google sign-in error:", error);
             const errorMessage = handleFirebaseError(error);
             onError?.(errorMessage);
@@ -92,7 +92,6 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
             [name]: value
         }));
 
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
