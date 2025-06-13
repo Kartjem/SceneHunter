@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scenehunter-v2
+spec:
+  template:
+    spec:
+      containers:
+      - name: scenehunter-v2
+        env:
+        - name: NODE_ENV
+          value: "development"
+        - name: NEXT_PUBLIC_ENV
+          value: "development"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "125m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"

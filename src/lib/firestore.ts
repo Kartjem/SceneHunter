@@ -2,6 +2,7 @@ import {
     collection,
     doc,
     addDoc,
+    setDoc,
     updateDoc,
     deleteDoc,
     getDoc,
@@ -132,6 +133,30 @@ class FirestoreAPI<T, TCreate, TUpdate> {
 export class UserAPI extends FirestoreAPI<UserProfile, CreateUserProfile, UpdateUserProfile> {
     constructor() {
         super(COLLECTIONS.USERS);
+    }
+
+    async create(data: CreateUserProfile & { uid: string }): Promise<string> {
+        try {
+            const { uid, ...userData } = data;
+            const docRef = doc(db, COLLECTIONS.USERS, uid);
+            await setDoc(docRef, {
+                ...userData,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                stats: {
+                    locationsAdded: 0,
+                    reviewsWritten: 0,
+                    favoriteMovies: []
+                }
+            });
+            return uid;
+        } catch (error) {
+            throw new FirestoreError(
+                `Failed to create user document: ${error}`,
+                'create-failed',
+                'create'
+            );
+        }
     }
 
     async getByEmail(email: string): Promise<UserProfile | null> {

@@ -1,0 +1,92 @@
+
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: scenehunter-v2-pipeline
+  labels:
+    app: scenehunter-v2
+description: "SceneHunter V2 deployment pipeline with staged rollouts"
+serialPipeline:
+  stages:
+  - targetId: dev-target
+    profiles: [dev]
+    strategy:
+      standard:
+        verify: false
+  - targetId: staging-target
+    profiles: [staging]
+    strategy:
+      standard:
+        verify: true
+        predeploy:
+          actions: ["smoke-tests"]
+        postdeploy:
+          actions: ["integration-tests"]
+  - targetId: production-target
+    profiles: [production]
+    strategy:
+      canary:
+        runtimeConfig:
+          kubernetes:
+            serviceNetworking:
+              service: "scenehunter-v2-service"
+              deployment: "scenehunter-v2"
+        canaryDeployment:
+          percentages: [25, 50, 100]
+          verify: true
+          predeploy:
+            actions: ["load-tests"]
+          postdeploy:
+            actions: ["monitoring-setup"]
+
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: dev-target
+  labels:
+    environment: dev
+description: "Development environment target"
+gke:
+  cluster: projects/PROJECT_ID/locations/europe-west1/clusters/scenehunter-dev
+executionConfigs:
+- usages: [RENDER, DEPLOY, VERIFY]
+  defaultPool:
+    serviceAccount: cloud-deploy-dev@PROJECT_ID.iam.gserviceaccount.com
+  artifactStorage: "gs://PROJECT_ID-deploy-artifacts"
+
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: staging-target
+  labels:
+    environment: staging
+description: "Staging environment target"
+gke:
+  cluster: projects/PROJECT_ID/locations/europe-west1/clusters/scenehunter-staging
+executionConfigs:
+- usages: [RENDER, DEPLOY, VERIFY]
+  defaultPool:
+    serviceAccount: cloud-deploy-staging@PROJECT_ID.iam.gserviceaccount.com
+  artifactStorage: "gs://PROJECT_ID-deploy-artifacts"
+
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: production-target
+  labels:
+    environment: production
+description: "Production environment target"
+gke:
+  cluster: projects/PROJECT_ID/locations/europe-west1/clusters/scenehunter-prod
+executionConfigs:
+- usages: [RENDER, DEPLOY, VERIFY]
+  defaultPool:
+    serviceAccount: cloud-deploy-prod@PROJECT_ID.iam.gserviceaccount.com
+  artifactStorage: "gs://PROJECT_ID-deploy-artifacts"
+requireApproval: true
+deployParameters:
+  minReadySeconds: "30"
+  progressDeadlineSeconds: "600"

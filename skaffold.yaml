@@ -1,0 +1,65 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: scenehunter-v2
+build:
+  artifacts:
+  - image: app
+    docker:
+      dockerfile: Dockerfile
+  tagPolicy:
+    envTemplate:
+      template: "{{.IMAGE_NAME}}:{{.TAG}}"
+  local:
+    push: false
+
+profiles:
+- name: dev
+  manifests:
+    kustomize:
+      paths:
+      - k8s/dev
+  deploy:
+    kubectl: {}
+
+- name: staging
+  manifests:
+    kustomize:
+      paths:
+      - k8s/staging
+  deploy:
+    kubectl: {}
+
+- name: production
+  manifests:
+    kustomize:
+      paths:
+      - k8s/production
+  deploy:
+    kubectl: {}
+
+# Cloud Deploy configuration
+deploy:
+  cloudrun: {}
+
+verify:
+- name: smoke-tests
+  container:
+    name: smoke-tests
+    image: gcr.io/PROJECT_ID/scenehunter-tests:latest
+    command: ["/bin/sh"]
+    args: ["-c", "npm run test:smoke"]
+
+- name: integration-tests
+  container:
+    name: integration-tests
+    image: gcr.io/PROJECT_ID/scenehunter-tests:latest
+    command: ["/bin/sh"]
+    args: ["-c", "npm run test:integration"]
+
+- name: load-tests
+  container:
+    name: load-tests
+    image: gcr.io/PROJECT_ID/scenehunter-tests:latest
+    command: ["/bin/sh"]
+    args: ["-c", "npm run test:load"]

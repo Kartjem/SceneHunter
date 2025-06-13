@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: scenehunter-v2-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "scenehunter-v2-dev-ip"
+    # Временно используем автоматические SSL сертификаты
+    # networking.gke.io/managed-certificates: "scenehunter-v2-dev-ssl-cert"
+spec:
+  rules:
+  # Убираем домен пока его нет - используем IP
+  # - host: dev.scenehunter.app
+  - http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: dev-scenehunter-v2-service
+            port:
+              number: 80
+# Убираем SSL сертификат пока нет домена  
+# ---
+# apiVersion: networking.gke.io/v1
+# kind: ManagedCertificate
+# metadata:
+#   name: scenehunter-v2-dev-ssl-cert
+# spec:
+#   domains:
+#     - dev.scenehunter.app

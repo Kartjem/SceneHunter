@@ -1,0 +1,194 @@
+# Автоматически запускает Cloud Build при push в ветки develop и main
+
+name: CI/CD Pipeline
+
+on:
+  # Отключаем автоматический push триггер
+  # push:
+  #   branches: [main, develop]
+  #   paths:
+  #     - 'src/**'
+  #     - 'public/**'
+  #     - 'package*.json'
+  #     - 'Dockerfile'
+  #     - 'next.config.js'
+  #     - 'tailwind.config.js'
+  #     - 'tsconfig.json'
+  
+  # Только для Pull Requests (тестирование)
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package*.json'
+      - 'Dockerfile'
+      - 'next.config.js'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+  
+  # Ручной запуск
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - staging
+        - production
+
+env:
+  NODE_VERSION: '18'
+  GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+  GCLOUD_REGION: 'europe-west1'
+
+jobs:
+  # Job 1: Lint and Test
+  test:
+    name: 'Test and Lint'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run ESLint
+      run: npm run lint
+      
+    - name: Run unit tests
+      run: npm run test:ci
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Upload test coverage
+      uses: codecov/codecov-action@v3
+      if: success()
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage/lcov.info
+
+  # Job 2: Security Audit
+  security:
+    name: 'Security Audit'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run npm audit
+      run: npm audit --audit-level moderate
+      
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  # Job 3: Docker Build Test
+  docker-test:
+    name: 'Docker Build Test'
+    runs-on: ubuntu-latest
+    needs: [test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false
+        tags: scenehunter-v2:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Job 4: Trigger Cloud Build (only for main/develop branches)
+  deploy:
+    name: 'Deploy via Cloud Build'
+    runs-on: ubuntu-latest
+    needs: [test, security, docker-test]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCLOUD_SA_KEY }}
+        
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.GCLOUD_PROJECT_ID }}
+        
+    - name: Trigger Cloud Build
+      run: |
+        gcloud builds submit \
+          --config=cloudbuild.yaml \
+          --substitutions=BRANCH_NAME=${{ github.ref_name }},COMMIT_SHA=${{ github.sha }} \
+          --region=${{ env.GCLOUD_REGION }}
+          
+    - name: Wait for deployment (dev environment)
+      if: github.ref == 'refs/heads/develop'
+      run: |
+        echo "Waiting for development deployment to complete..."
+        sleep 60
+        
+    - name: Wait for Cloud Deploy release (main branch)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Cloud Deploy release created. Check Google Cloud Console for staging/production deployment status."
+
+  # Job 5: Notify Slack (optional)
+  notify:
+    name: 'Slack Notification'
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    
+    steps:
+    - name: Notify Slack on success
+      if: needs.deploy.result == 'success'
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        text: '✅ SceneHunter V2 deployment successful!'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        
+    - name: Notify Slack on failure
+      if: needs.deploy.result == 'failure'
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        text: '❌ SceneHunter V2 deployment failed!'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
