@@ -26,10 +26,6 @@ jest.mock('@/lib/firebase', () => ({
     auth: {},
 }))
 
-jest.mock('@/hooks/use-firebase', () => ({
-    handleFirebaseError: jest.fn((error) => error.message || 'Unknown error'),
-}))
-
 describe('Auth Page Integration', () => {
     beforeEach(() => {
         jest.clearAllMocks()
@@ -38,8 +34,8 @@ describe('Auth Page Integration', () => {
     it('renders with sign in and sign up buttons', () => {
         render(<AuthPage />)
 
-        const signInButton = screen.getByRole('button', { name: 'Sign In' })
-        const signUpButton = screen.getByRole('button', { name: 'Sign Up' })
+        const signInButton = screen.getByRole('tab', { name: 'Sign In' })
+        const signUpButton = screen.getByRole('tab', { name: 'Create Account' })
 
         expect(signInButton).toBeDefined()
         expect(signUpButton).toBeDefined()
@@ -64,7 +60,7 @@ describe('Auth Page Integration', () => {
         const firstNameInput = screen.queryByLabelText(/first name/i)
         expect(firstNameInput).toBeNull()
 
-        const signUpButton = screen.getByRole('button', { name: 'Sign Up' })
+        const signUpButton = screen.getByRole('tab', { name: 'Create Account' })
         await user.click(signUpButton)
 
         await waitFor(() => {
@@ -75,7 +71,7 @@ describe('Auth Page Integration', () => {
         const lastNameInput = screen.getByLabelText(/last name/i)
         expect(lastNameInput).toBeDefined()
 
-        const signInButton = screen.getByRole('button', { name: 'Sign In' })
+        const signInButton = screen.getByRole('tab', { name: 'Sign In' })
         await user.click(signInButton)
 
         await waitFor(() => {
@@ -87,8 +83,8 @@ describe('Auth Page Integration', () => {
     it('displays correct title and description', () => {
         render(<AuthPage />)
 
-        const welcomeHeader = screen.getByText('Welcome Back')
-        const description = screen.getByText(/sign in to your account/i)
+        const welcomeHeader = screen.getByText('Welcome to the Platform')
+        const description = screen.getByText(/sign in to your professional account/i)
 
         expect(welcomeHeader).toBeDefined()
         expect(description).toBeDefined()
@@ -98,19 +94,21 @@ describe('Auth Page Integration', () => {
         const user = userEvent.setup()
         render(<AuthPage />)
 
-        const welcomeBackHeader = screen.getByText('Welcome Back')
-        expect(welcomeBackHeader).toBeDefined()
+        // Initially we're on the Sign In tab
+        const signInTab = screen.getByRole('tab', { name: 'Sign In' })
+        expect(signInTab).toHaveAttribute('aria-selected', 'true')
 
-        const signUpButton = screen.getByRole('button', { name: 'Sign Up' })
+        const signUpButton = screen.getByRole('tab', { name: 'Create Account' })
         await user.click(signUpButton)
 
         await waitFor(() => {
-            const joinHeader = screen.getByText('Join SceneHunter')
-            expect(joinHeader).toBeDefined()
+            const signUpTabSelected = screen.getByRole('tab', { name: 'Create Account' })
+            expect(signUpTabSelected).toHaveAttribute('aria-selected', 'true')
         })
 
-        const createAccountText = screen.getByText(/create your account to get started/i)
-        expect(createAccountText).toBeDefined()
+        // Check if signup form fields are visible
+        const firstNameInput = screen.getByLabelText(/first name/i)
+        expect(firstNameInput).toBeDefined()
     })
 
     it('correctly handles form interaction', async () => {

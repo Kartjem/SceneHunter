@@ -15,10 +15,6 @@ jest.mock('@/lib/firebase', () => ({
     auth: {},
 }))
 
-jest.mock('@/hooks/use-firebase', () => ({
-    handleFirebaseError: jest.fn((error) => error.message || 'Unknown error'),
-}))
-
 describe('LoginForm', () => {
     beforeEach(() => {
         jest.clearAllMocks()

@@ -7,15 +7,13 @@ import { signInWithEmailAndPassword, signInWithPopup, UserCredential } from 'fir
 jest.mock('firebase/auth', () => ({
     signInWithEmailAndPassword: jest.fn(),
     signInWithPopup: jest.fn(),
-    GoogleAuthProvider: jest.fn(),
+    GoogleAuthProvider: jest.fn().mockImplementation(() => ({
+        addScope: jest.fn(),
+    })),
 }))
 
 jest.mock('@/lib/firebase', () => ({
     auth: {},
-}))
-
-jest.mock('@/hooks/use-firebase', () => ({
-    handleFirebaseError: jest.fn((error) => error.message || 'Unknown error'),
 }))
 
 const mockSignInWithEmailAndPassword = signInWithEmailAndPassword as jest.MockedFunction<typeof signInWithEmailAndPassword>

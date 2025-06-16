@@ -1,5 +1,9 @@
 import './globals.css';
 import { ThemeProvider } from '@/hooks/use-theme';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { ToastProvider } from '@/components/ui/toast';
+import { ErrorBoundary, GlobalErrorHandler } from '@/components/ErrorBoundary';
 import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
@@ -61,9 +65,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <ErrorBoundary>
+          <GlobalErrorHandler>
+            <ToastProvider>
+              <QueryProvider>
+                <AuthProvider>
+                  <ThemeProvider>
+                    {children}
+                  </ThemeProvider>
+                </AuthProvider>
+              </QueryProvider>
+            </ToastProvider>
+          </GlobalErrorHandler>
+        </ErrorBoundary>
       </body>
     </html>
   )

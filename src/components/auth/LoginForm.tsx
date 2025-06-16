@@ -9,7 +9,9 @@ import {
 } from "@tabler/icons-react";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { handleFirebaseError } from "@/hooks/use-firebase";
+import { handleFirebaseError, useFirebaseAuth } from "@/hooks/use-firebase";
+import { useCreateUserProfile } from "@/hooks/useUserProfile";
+import { useToast } from "@/components/ui/toast";
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -17,6 +19,8 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess, onError }: LoginFormProps) {
+    const { user, isAuthenticated, createUserProfile } = useFirebaseAuth();
+    const { showToast } = useToast();
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -58,6 +62,23 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
             );
 
             console.log("User logged in successfully:", userCredential.user);
+
+            // Create or update user profile
+            if (userCredential.user) {
+                try {
+                    await createUserProfile({
+                        uid: userCredential.user.uid,
+                        email: userCredential.user.email,
+                        displayName: userCredential.user.displayName,
+                        photoURL: userCredential.user.photoURL,
+                        emailVerified: userCredential.user.emailVerified,
+                    });
+                } catch (profileError) {
+                    console.error("Profile creation error:", profileError);
+                    // Don't block the login flow if profile creation fails
+                }
+            }
+
             onSuccess?.();
         } catch (error: unknown) {
             console.error("Login error:", error);
@@ -73,12 +94,64 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
 
         try {
             const provider = new GoogleAuthProvider();
-            const result = await signInWithPopup(auth, provider);
-            console.log("Google sign-in successful:", result.user);
+            provider.addScope('email');
+            provider.addScope('profile');
+
+            // Try popup first, fallback to redirect if blocked
+            let result;
+            try {
+                result = await signInWithPopup(auth, provider);
+                console.log("Google sign-in successful:", result.user);
+            } catch (popupError: any) {
+                console.error("Popup error:", popupError);
+                
+                // Handle specific popup errors
+                if (popupError.code === 'auth/popup-blocked') {
+                    // Show user-friendly notification about popup being blocked
+                    showToast('Popup was blocked. Redirecting to Google sign-in...', 'warning');
+
+                    // Fallback to redirect method
+                    console.log('Popup blocked, using redirect method');
+                    const { signInWithRedirect } = await import('firebase/auth');
+                    await signInWithRedirect(auth, provider);
+                    return; // Exit here as redirect will handle the rest
+                } else if (popupError.code === 'auth/popup-closed-by-user') {
+                    // User closed the popup, don't show error
+                    console.log('User closed the popup');
+                    return;
+                } else if (popupError.code === 'auth/cancelled-popup-request') {
+                    // Multiple popup requests, don't show error
+                    console.log('Popup request cancelled');
+                    return;
+                }
+                
+                // For other errors, re-throw to be handled below
+                throw popupError;
+            }
+
+            // Create or update user profile
+            if (result && result.user) {
+                try {
+                    await createUserProfile({
+                        uid: result.user.uid,
+                        email: result.user.email,
+                        displayName: result.user.displayName,
+                        photoURL: result.user.photoURL,
+                        emailVerified: result.user.emailVerified,
+                    });
+                } catch (profileError) {
+                    console.error("Profile creation error:", profileError);
+                    // Don't block the login flow if profile creation fails
+                }
+            }
+
             onSuccess?.();
         } catch (error: unknown) {
             console.error("Google sign-in error:", error);
             const errorMessage = handleFirebaseError(error);
+
+            // Only show error toast for actual errors (not user cancellations)
+            showToast(errorMessage, 'error');
             onError?.(errorMessage);
         } finally {
             setIsLoading(false);

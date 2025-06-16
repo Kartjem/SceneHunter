@@ -1,107 +1,582 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AuthRedirect } from "@/components/auth/AuthRedirect";
+import {
+    Film,
+    Shield,
+    Database,
+    BarChart3,
+    Search,
+    Building,
+    FileText,
+    Award,
+    Zap,
+    Cloud,
+    Lock,
+    Users,
+    Camera,
+    MapPin,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Target,
+    Rocket
+} from "lucide-react";
 
 export default function HomePage() {
     return (
-        <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-            {/* Apple-style gradient mesh background */}
-            <div className="absolute inset-0 bg-apple-mesh dark:bg-apple-mesh-dark" />
-
-            {/* Floating gradient orbs */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-apple-blue opacity-20 rounded-full blur-3xl floating" />
-            <div className="absolute top-3/4 right-1/4 w-80 h-80 bg-apple-purple opacity-15 rounded-full blur-3xl floating-delayed" />
-            <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-apple-orange opacity-10 rounded-full blur-2xl floating" style={{ animationDelay: '-4s' }} />
-
-            {/* Glass navigation bar */}
-            <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
-                <div className="glass rounded-2xl px-6 py-3">
-                    <div className="flex items-center space-x-8">
-                        <div className="text-lg font-semibold text-foreground">SceneHunter</div>
-                        <div className="hidden md:flex items-center space-x-6 text-sm text-muted-foreground">
-                            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-                            <a href="#about" className="hover:text-foreground transition-colors">About</a>
-                            <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
-                        </div>
-                        <ThemeToggle />
-                    </div>
-                </div>
-            </nav>
-
-            {/* Main content */}
-            <div className="flex items-center justify-center min-h-screen px-4 pt-20">
-                <div className="text-center relative z-10 max-w-5xl mx-auto">
-                    <div className="mb-12 animate-fade-in-up">
-                        <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
-                            <span className="bg-apple-blue bg-clip-text text-transparent">Welcome to</span>
-                            <br />
-                            <span className="text-foreground">SceneHunter</span>
-                        </h1>
-                        <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-3xl mx-auto">
-                            Discover breathtaking filming locations from your favorite movies and shows.
-                            Experience the magic behind the scenes.
-                        </p>
-                    </div>
-
-                    {/* Apple-style buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        <Link
-                            href="/auth"
-                            className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-apple-blue rounded-2xl hover:bg-apple-blue/90 transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-apple-blue focus:ring-offset-2 focus:ring-offset-background overflow-hidden"
-                        >
-                            <div className="absolute inset-0 bg-apple-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <span className="relative z-10 flex items-center">
-                                Get Started
-                                <svg className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </span>
-                        </Link>
-
-                        <button className="group glass rounded-2xl px-8 py-4 text-lg font-medium text-foreground hover:bg-background/50 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
-                            <span className="flex items-center">
-                                Watch Demo
-                                <svg className="ml-2 h-5 w-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </span>
-                        </button>
-                    </div>
-
-                    {/* Feature cards with glass morphism */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                        <div className="group glass rounded-3xl p-8 hover:bg-background/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                            <div className="w-16 h-16 bg-apple-blue rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+        <AuthRedirect>
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
+                {/* Navigation */}
+                <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <Film className="h-8 w-8 text-blue-600" />
+                                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                    SceneHunter
+                                </span>
                             </div>
-                            <h3 className="text-xl font-semibold text-foreground mb-3">Discover Locations</h3>
-                            <p className="text-muted-foreground leading-relaxed">Find iconic filming spots from blockbuster movies and beloved TV series around the world.</p>
-                        </div>
 
-                        <div className="group glass rounded-3xl p-8 hover:bg-background/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                            <div className="w-16 h-16 bg-apple-purple rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
+                            <div className="hidden md:flex items-center space-x-8">
+                                <Link href="#platform" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors">
+                                    Platform
+                                </Link>
+                                <Link href="#roadmap" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors">
+                                    Roadmap
+                                </Link>
+                                <Link href="#architecture" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors">
+                                    Architecture
+                                </Link>
+                                <ThemeToggle />
+                                <Button asChild>
+                                    <Link href="/auth">Get Started</Link>
+                                </Button>
                             </div>
-                            <h3 className="text-xl font-semibold text-foreground mb-3">Save Favorites</h3>
-                            <p className="text-muted-foreground leading-relaxed">Create personalized collections of your most-loved scenes and share them with friends.</p>
-                        </div>
 
-                        <div className="group glass rounded-3xl p-8 hover:bg-background/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-                            <div className="w-16 h-16 bg-apple-green rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                </svg>
+                            <div className="md:hidden flex items-center space-x-2">
+                                <ThemeToggle />
+                                <Button size="sm" asChild>
+                                    <Link href="/auth">Get Started</Link>
+                                </Button>
                             </div>
-                            <h3 className="text-xl font-semibold text-foreground mb-3">Connect & Share</h3>
-                            <p className="text-muted-foreground leading-relaxed">Join a community of film enthusiasts and discover hidden gems together.</p>
                         </div>
                     </div>
-                </div>
+                </nav>
+
+                {/* Hero Section */}
+                <section className="pt-32 pb-20 px-4">
+                    <div className="container mx-auto text-center">
+                        <div className="max-w-4xl mx-auto">
+                            <Badge variant="secondary" className="mb-4">
+                                <Rocket className="h-4 w-4 mr-2" />
+                                Platform Development in Progress
+                            </Badge>
+
+                            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 dark:from-slate-100 dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
+                                Building the Future of
+                                <br />
+                                Film Production
+                            </h1>
+
+                            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-12 leading-relaxed">
+                                A comprehensive cloud-native platform connecting film professionals, location scouts,
+                                and funding organizations. We're creating the next generation of film industry tools.
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                                <Button size="lg" className="group" asChild>
+                                    <Link href="/auth">
+                                        Join Early Access
+                                        <Rocket className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    </Link>
+                                </Button>
+
+                                <Button size="lg" variant="outline" className="group">
+                                    <Calendar className="mr-2 h-4 w-4" />
+                                    Schedule Demo
+                                </Button>
+                            </div>
+
+                            {/* Current Status */}
+                            <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm rounded-2xl p-6 mb-8">
+                                <div className="flex flex-wrap justify-center items-center gap-6 text-sm">
+                                    <div className="flex items-center gap-2 text-green-600">
+                                        <CheckCircle className="h-4 w-4" />
+                                        <span>Authentication System</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-green-600">
+                                        <CheckCircle className="h-4 w-4" />
+                                        <span>UI Components</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-blue-600">
+                                        <Clock className="h-4 w-4" />
+                                        <span>Dashboard Development</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-blue-600">
+                                        <Clock className="h-4 w-4" />
+                                        <span>Application System</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Platform Overview */}
+                <section id="platform" className="py-20 px-4 bg-white/50 dark:bg-slate-900/50">
+                    <div className="container mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                                What We're Building
+                            </h2>
+                            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
+                                A comprehensive platform that transforms how film professionals manage projects,
+                                apply for funding, and collaborate on productions.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Film Professionals */}
+                            <Card className="border-2 border-blue-200 dark:border-blue-800 hover:shadow-xl transition-all duration-300">
+                                <CardHeader>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Camera className="h-8 w-8 text-blue-600" />
+                                        <CardTitle className="text-xl">For Film Professionals</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                        Producers, directors, and location scouts
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                            <span className="text-sm">Streamlined rebate applications</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                            <span className="text-sm">Advanced location search & booking</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                            <span className="text-sm">Project management tools</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                            <span className="text-sm">Professional networking</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Film Funds */}
+                            <Card className="border-2 border-purple-200 dark:border-purple-800 hover:shadow-xl transition-all duration-300">
+                                <CardHeader>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Building className="h-8 w-8 text-purple-600" />
+                                        <CardTitle className="text-xl">For Film Fund Organizations</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                        Funding bodies and government agencies
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                            <span className="text-sm">Application review workflows</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                            <span className="text-sm">Fund management dashboards</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                            <span className="text-sm">Content moderation tools</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                            <span className="text-sm">Impact analytics & reporting</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Platform Admin */}
+                            <Card className="border-2 border-green-200 dark:border-green-800 hover:shadow-xl transition-all duration-300">
+                                <CardHeader>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Shield className="h-8 w-8 text-green-600" />
+                                        <CardTitle className="text-xl">Platform Administration</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                        System management and operations
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                            <span className="text-sm">User & organization management</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                            <span className="text-sm">System analytics & monitoring</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                            <span className="text-sm">Content administration</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                            <span className="text-sm">Security configuration</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Development Roadmap */}
+                <section id="roadmap" className="py-20 px-4">
+                    <div className="container mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                                Development Roadmap
+                            </h2>
+                            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                                Our planned development phases to deliver a world-class film industry platform
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {/* Phase 1 */}
+                            <Card className="relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-green-600"></div>
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                            Phase 1
+                                        </Badge>
+                                        <CheckCircle className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <CardTitle className="text-lg">Foundation</CardTitle>
+                                    <CardDescription>Core Infrastructure</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="h-3 w-3 text-green-600" />
+                                        <span>Authentication System</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="h-3 w-3 text-green-600" />
+                                        <span>UI Component Library</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="h-3 w-3 text-green-600" />
+                                        <span>Basic Layouts</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="h-3 w-3 text-green-600" />
+                                        <span>Role-based Access</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Phase 2 */}
+                            <Card className="relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                            Phase 2
+                                        </Badge>
+                                        <Clock className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <CardTitle className="text-lg">Core Features</CardTitle>
+                                    <CardDescription>Professional Tools</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="h-3 w-3 text-blue-600" />
+                                        <span>Application System</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="h-3 w-3 text-blue-600" />
+                                        <span>Location Catalog</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="h-3 w-3 text-blue-600" />
+                                        <span>Project Management</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="h-3 w-3 text-blue-600" />
+                                        <span>Media Library</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Phase 3 */}
+                            <Card className="relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-purple-600"></div>
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                                            Phase 3
+                                        </Badge>
+                                        <Target className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <CardTitle className="text-lg">Advanced Tools</CardTitle>
+                                    <CardDescription>AI & Analytics</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <Target className="h-3 w-3 text-purple-600" />
+                                        <span>AI-Powered Search</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Target className="h-3 w-3 text-purple-600" />
+                                        <span>Advanced Analytics</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Target className="h-3 w-3 text-purple-600" />
+                                        <span>Automated Workflows</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Target className="h-3 w-3 text-purple-600" />
+                                        <span>Smart Recommendations</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Phase 4 */}
+                            <Card className="relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-orange-600"></div>
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                                            Phase 4
+                                        </Badge>
+                                        <Rocket className="h-5 w-5 text-orange-600" />
+                                    </div>
+                                    <CardTitle className="text-lg">Enterprise</CardTitle>
+                                    <CardDescription>Scale & Innovation</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <Rocket className="h-3 w-3 text-orange-600" />
+                                        <span>Enterprise Integration</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Rocket className="h-3 w-3 text-orange-600" />
+                                        <span>Mobile Applications</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Rocket className="h-3 w-3 text-orange-600" />
+                                        <span>API Ecosystem</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Rocket className="h-3 w-3 text-orange-600" />
+                                        <span>Global Expansion</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Technical Architecture */}
+                <section id="architecture" className="py-20 px-4 bg-white/50 dark:bg-slate-900/50">
+                    <div className="container mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                                Technical Architecture
+                            </h2>
+                            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                                Built on modern cloud-native technologies for scalability, security, and performance
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <Card className="hover:shadow-xl transition-all duration-300">
+                                <CardHeader>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Cloud className="h-6 w-6 text-blue-600" />
+                                        <CardTitle className="text-lg">Frontend</CardTitle>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                        <span>Next.js 15 with App Router</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                        <span>React 18 with TypeScript</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                        <span>Tailwind CSS & shadcn/ui</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                        <span>React Query & Zustand</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="hover:shadow-xl transition-all duration-300">
+                                <CardHeader>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Database className="h-6 w-6 text-green-600" />
+                                        <CardTitle className="text-lg">Backend & Data</CardTitle>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                        <span>Firebase Auth & Firestore</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                        <span>Google Cloud Platform</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                        <span>Cloud Functions & Cloud Run</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                        <span>PostgreSQL & BigQuery</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="hover:shadow-xl transition-all duration-300">
+                                <CardHeader>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Shield className="h-6 w-6 text-purple-600" />
+                                        <CardTitle className="text-lg">Security & DevOps</CardTitle>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                        <span>Enterprise-grade security</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                        <span>CI/CD with Cloud Build</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                        <span>Kubernetes deployment</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                        <span>Monitoring & observability</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </section>
+
+                {/* CTA Section */}
+                <section className="py-20 px-4">
+                    <div className="container mx-auto text-center">
+                        <Card className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 border-0 text-white">
+                            <CardContent className="p-12">
+                                <h2 className="text-4xl font-bold mb-4">
+                                    Be Part of the Future
+                                </h2>
+                                <p className="text-xl mb-8 text-blue-100">
+                                    Join our early access program and help shape the platform that will transform the film industry
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <Button size="lg" variant="secondary" asChild>
+                                        <Link href="/auth">
+                                            Request Early Access
+                                            <Rocket className="ml-2 h-4 w-4" />
+                                        </Link>
+                                    </Button>
+                                    <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                                        Learn More
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </section>
+
+                {/* Footer */}
+                <footer className="py-12 px-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                    <div className="container mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                            <div className="space-y-4">
+                                <div className="flex items-center space-x-2">
+                                    <Film className="h-6 w-6 text-blue-600" />
+                                    <span className="text-xl font-bold">SceneHunter</span>
+                                </div>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm">
+                                    The next generation film production platform - currently in development.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold mb-3">Platform</h3>
+                                <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                                    <li><a href="#platform" className="hover:text-slate-900 dark:hover:text-slate-100">Overview</a></li>
+                                    <li><a href="#roadmap" className="hover:text-slate-900 dark:hover:text-slate-100">Roadmap</a></li>
+                                    <li><a href="#architecture" className="hover:text-slate-900 dark:hover:text-slate-100">Architecture</a></li>
+                                    <li><a href="/auth" className="hover:text-slate-900 dark:hover:text-slate-100">Early Access</a></li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold mb-3">Development</h3>
+                                <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                                    <li><span className="text-slate-400">Documentation (Coming Soon)</span></li>
+                                    <li><span className="text-slate-400">API Reference (Coming Soon)</span></li>
+                                    <li><span className="text-slate-400">Developer Tools (Coming Soon)</span></li>
+                                    <li><span className="text-slate-400">Community (Coming Soon)</span></li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold mb-3">Company</h3>
+                                <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                                    <li><span className="text-slate-400">About Us (Coming Soon)</span></li>
+                                    <li><span className="text-slate-400">Contact (Coming Soon)</span></li>
+                                    <li><span className="text-slate-400">Careers (Coming Soon)</span></li>
+                                    <li><span className="text-slate-400">Press Kit (Coming Soon)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-slate-200 dark:border-slate-800">
+                            <div className="text-slate-600 dark:text-slate-400 text-sm">
+                                © 2025 SceneHunter. Platform in development.
+                            </div>
+                            <div className="flex items-center space-x-4 mt-4 md:mt-0">
+                                <Badge variant="outline" className="gap-1">
+                                    <Cloud className="h-3 w-3" />
+                                    Cloud-Native
+                                </Badge>
+                                <Badge variant="outline" className="gap-1">
+                                    <Lock className="h-3 w-3" />
+                                    Enterprise Ready
+                                </Badge>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
             </div>
-        </div>
+        </AuthRedirect>
     );
 }

@@ -15,10 +15,6 @@ jest.mock('@/lib/firebase', () => ({
     auth: {},
 }))
 
-jest.mock('@/hooks/use-firebase', () => ({
-    handleFirebaseError: jest.fn((error) => error.message || 'Unknown error'),
-}))
-
 describe('LoginForm - Basic Functionality', () => {
     it('renders without errors', () => {
         render(<LoginForm />)
