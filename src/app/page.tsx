@@ -25,6 +25,7 @@ import {
     Target,
     Rocket
 } from "lucide-react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function HomePage() {
     return (
@@ -95,10 +96,30 @@ export default function HomePage() {
                                     </Link>
                                 </Button>
 
-                                <Button size="lg" variant="outline" className="group">
-                                    <Calendar className="mr-2 h-4 w-4" />
-                                    Schedule Demo
-                                </Button>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button size="lg" variant="outline" className="group">
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            Schedule Demo
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle>Watch Demo Video</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="aspect-video w-full">
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src="https://www.youtube.com/embed/CX-pgHT7l2s"
+                                                title="SceneHunter Demo"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                allowFullScreen
+                                            ></iframe>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
 
                             {/* Current Status */}

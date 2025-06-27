@@ -15,10 +15,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Initialize App Check - temporarily disabled to avoid 403 errors
-if (typeof window !== 'undefined' && false) { // Set to false to disable for now
+if (typeof window !== 'undefined') {
     try {
-        // Add debug token for development first
         if (process.env.NODE_ENV === 'development') {
             const debugToken = process.env.NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN;
             if (debugToken && debugToken !== '') {
@@ -26,11 +24,9 @@ if (typeof window !== 'undefined' && false) { // Set to false to disable for now
                 console.log('Firebase App Check debug token set for development');
             }
         }
-
-        // Only initialize App Check if we have a valid reCAPTCHA key
         const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
         if (recaptchaKey && recaptchaKey !== '' && !recaptchaKey?.startsWith('your-')) {
-            const appCheck = initializeAppCheck(app, {
+            initializeAppCheck(app, {
                 provider: new ReCaptchaEnterpriseProvider(recaptchaKey as string),
                 isTokenAutoRefreshEnabled: true
             });
@@ -45,19 +41,12 @@ if (typeof window !== 'undefined' && false) { // Set to false to disable for now
             code: error?.code,
             details: error
         });
-        // Don't let App Check initialization failure break the app
-        // Suppress any unhandled promise rejections from App Check
         if (error && typeof error.then === 'function') {
             error.catch((err: any) => {
                 console.warn('Suppressed App Check promise rejection:', err);
             });
         }
     }
-}
-
-// Log that App Check is disabled
-if (typeof window !== 'undefined') {
-    console.log('Firebase App Check is temporarily disabled to avoid 403 errors');
 }
 
 export const auth = getAuth(app);
