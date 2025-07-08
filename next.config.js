@@ -1,50 +1,31 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Enable standalone output for Docker optimization
-    output: 'standalone',
+  // 1. Указываем Next.js создавать статический сайт в папке 'out'
+  output: 'export',
 
-    // Optimize images for production
-    images: {
-        domains: ['firebasestorage.googleapis.com'],
-        remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: 'firebasestorage.googleapis.com',
-            },
-        ],
-    },
+  // 2. Отключаем оптимизацию изображений на сервере (обязательно для статики)
+  images: {
+    unoptimized: true,
+  },
 
-    // Environment variables validation
-    env: {
-        CUSTOM_KEY: process.env.CUSTOM_KEY,
-    },
-    
-    // VVV THIS IS THE NEW BLOCK YOU NEED TO ADD VVV
-    // It tells the Next.js development server to forward API requests to your backend
-    async rewrites() {
-        return [
-          {
-            source: '/api/:path*',
-            destination: 'http://localhost:3001/api/:path*', // Proxy to Backend
-          },
-        ];
-    },
-    // ^^^ END OF THE NEW BLOCK ^^^
-
-    // Security headers
-    async headers() {
-        return [
-            {
-                source: '/(.*)',
-                headers: [
-                    {
-                        key: 'X-Frame-Options',
-                        value: 'DENY'
-                    },
-                    {
-                        key: 'X-Content-Type-Options',
-                        value: 'nosniff'
-                    },
+  // Все остальные ваши настройки (env, headers) могут оставаться, но
+  // блок `rewrites` нужно удалить, так как он не работает со статическим сайтом.
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+  async headers() {
+    return [
+        {
+            source: '/(.*)',
+            headers: [
+                {
+                    key: 'X-Frame-Options',
+                    value: 'DENY'
+                },
+                {
+                    key: 'X-Content-Type-Options',
+                    value: 'nosniff'
+                },
                     {
                         key: 'Referrer-Policy',
                         value: 'strict-origin-when-cross-origin'

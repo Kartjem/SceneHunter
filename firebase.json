@@ -1,21 +1,22 @@
 {
   "firestore": {
-    "database": "(default)",
-    "location": "eur3",
     "rules": "firestore.rules"
   },
   "storage": {
     "rules": "storage.rules"
   },
   "hosting": {
-    "source": ".",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
-    "frameworksBackend": {
-      "region": "us-central1"
-    }
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }
