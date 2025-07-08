@@ -1,0 +1,40 @@
+# Имя рабочего процесса
+name: Deploy to Firebase Hosting on push to main
+
+# Условие запуска: при любом пуше в ветку 'main'
+on:
+  push:
+    branches:
+      - main
+
+# Задачи, которые нужно выполнить
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest # Запускаем на виртуальной машине с Ubuntu
+    steps:
+      # 1. Клонируем репозиторий
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Устанавливаем Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Устанавливаем зависимости
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Собираем проект
+      - name: Build project
+        run: npm run build
+
+      # 5. Деплоим в Firebase, используя токен
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '' # Это поле оставляем пустым
+          token: '${{ secrets.FIREBASE_TOKEN }}' # <-- Используем наш новый секретный токен
+          projectId: scenehunter-29ff8
