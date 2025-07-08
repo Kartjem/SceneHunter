@@ -8,22 +8,16 @@ import {
     Film,
     Shield,
     Database,
-    BarChart3,
-    Search,
-    Building,
-    FileText,
-    Award,
-    Zap,
     Cloud,
     Lock,
-    Users,
     Camera,
-    MapPin,
     Calendar,
     CheckCircle,
     Clock,
     Target,
-    Rocket
+    Rocket,
+    Building,
+    Sparkles // Make sure to import the new icon
 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -68,6 +62,7 @@ export default function HomePage() {
                     </div>
                 </nav>
 
+
                 {/* Hero Section */}
                 <section className="pt-32 pb-20 px-4">
                     <div className="container mx-auto text-center">
@@ -95,6 +90,17 @@ export default function HomePage() {
                                         <Rocket className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                     </Link>
                                 </Button>
+                                
+                                {/* VVV ADD THIS BUTTON VVV
+                                    This is the new link to your AI Image Analyzer page.
+                                */}
+                                <Button size="lg" variant="outline" className="group" asChild>
+                                     <Link href="/image-analyzer">
+                                        AI Image Analyzer
+                                        <Sparkles className="ml-2 h-4 w-4 transition-transform group-hover:rotate-12" />
+                                     </Link>
+                                </Button>
+                                {/* ^^^ ADD THIS BUTTON ^^^ */}
 
                                 <Dialog>
                                     <DialogTrigger asChild>
