@@ -126,7 +126,7 @@ export default function ImageAnalyzerPage() {
     };
 
     if (isMobile) {
-        return <MobileLayout {...{ files, removeFile, selectedFile, setSelectedFileId, fileInputRef, router, processFiles }} />;
+        return <MobileLayout {...{ files, removeFile, selectedFile, setSelectedFileId, fileInputRef, router, processFiles, setFiles }} />;
     }
 
     return (
@@ -189,7 +189,7 @@ const Thumbnail: React.FC<{file: ProcessedFile, isSelected: boolean, onSelect: (
     );
 }
 
-// --- Analysis Panel (Исправлено) ---
+// --- Analysis Panel ---
 const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<React.SetStateAction<ProcessedFile[]>>}> = ({ file, setFiles }) => {
     
     const [activeTab, setActiveTab] = useState('description');
@@ -208,7 +208,18 @@ const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<Rea
         updateFileAnalysis(file.id, { [type]: 'Analyzing...', error: undefined });
         
         try {
-            const response = await fetch('/api/generate-with-gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ base64: file.base64, prompt }) });
+            // VVV --- ИЗМЕНЕНИЕ ЗДЕСЬ --- VVV
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL 
+                ? `${process.env.NEXT_PUBLIC_API_URL}/api/gemini` 
+                : '/api/gemini';
+
+            const response = await fetch(apiUrl, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ base64: file.base64, prompt }) 
+            });
+            // ^^^ --- КОНЕЦ ИЗМЕНЕНИЯ --- ^^^
+
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Backend request failed');
 
@@ -325,7 +336,7 @@ interface MobileLayoutProps {
     setSelectedFileId: (id: string) => void;
     processFiles: (files: FileList) => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
-    router: AppRouterInstance;
+    router: ReturnType<typeof useRouter>; 
 }
 
 const MobileLayout: React.FC<MobileLayoutProps> = ({ files, removeFile, selectedFile, setSelectedFileId, processFiles, fileInputRef, router }) => (
