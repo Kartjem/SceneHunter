@@ -5,7 +5,6 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import { ToastProvider } from '@/components/ui/toast';
 import { ErrorBoundary, GlobalErrorHandler } from '@/components/ErrorBoundary';
 import type { Metadata, Viewport } from 'next';
-import { AppCheckProvider } from './AppCheckProvider';
 
 export const metadata: Metadata = {
   title: 'SceneHunter',
@@ -67,7 +66,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {/* VVV --- ШАГ 2: Оборачиваем все в AppCheckProvider --- VVV */}
-        <AppCheckProvider>
           <ErrorBoundary>
             <GlobalErrorHandler>
               <ToastProvider>
@@ -81,7 +79,6 @@ export default function RootLayout({
               </ToastProvider>
             </GlobalErrorHandler>
           </ErrorBoundary>
-        </AppCheckProvider>
       </body>
     </html>
   )
