@@ -31,6 +31,8 @@ interface ProcessedFile {
     analysis: AnalysisResult;
 }
 
+type AnalysisType = keyof Omit<AnalysisResult, 'error' | 'similarQueryLink'>;
+
 // --- Reusable UI Components ---
 const Spinner: React.FC<{className?: string}> = ({ className }) => (
     <div className={cn("w-5 h-5 border-2 border-slate-300/50 border-t-blue-500 rounded-full animate-spin", className)} />
@@ -180,7 +182,7 @@ const Thumbnail: React.FC<{file: ProcessedFile, isSelected: boolean, onSelect: (
                  {file.base64 ? <img src={file.base64} alt={file.name} className="object-cover w-full h-full"/> : <div className="flex items-center justify-center h-full"><Spinner className="border-t-blue-600"/></div>}
                  {isAnalyzing && (
                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                         <Spinner className="h-8 w-8 border-4 border-t-white" />
+                         <Spinner className="h-8 w-8 border-4" />
                      </div>
                  )}
             </AspectRatio>
@@ -192,7 +194,12 @@ const Thumbnail: React.FC<{file: ProcessedFile, isSelected: boolean, onSelect: (
 // --- Analysis Panel ---
 const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<React.SetStateAction<ProcessedFile[]>>}> = ({ file, setFiles }) => {
     
-    const [activeTab, setActiveTab] = useState('description');
+    const [activeTab, setActiveTab] = useState<AnalysisType>('description');
+    const [isAnalyzing, setIsAnalyzing] = useState<Partial<Record<AnalysisType, boolean>>>({});
+
+    useEffect(() => {
+        setIsAnalyzing({});
+    }, [file.id]);
 
     const updateFileAnalysis = (id: string, newAnalysis: Partial<AnalysisResult>) => {
         setFiles(prevFiles => {
@@ -202,30 +209,19 @@ const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<Rea
         });
     };
     
-    const callBackendApi = async (type: keyof AnalysisResult, prompt: string) => {
-        if (!file.base64 || file.analysis[type]) return; 
+    const callBackendApi = async (type: AnalysisType, prompt: string) => {
+        if (!file.base64 || file.analysis[type] || isAnalyzing[type]) return; 
         setActiveTab(type);
-        updateFileAnalysis(file.id, { [type]: 'Analyzing...', error: undefined });
+        setIsAnalyzing(prev => ({ ...prev, [type]: true }));
         
         try {
-            // VVV --- ИЗМЕНЕНИЕ ЗДЕСЬ --- VVV
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL 
-                ? `${process.env.NEXT_PUBLIC_API_URL}/api/gemini` 
-                : '/api/gemini';
-
-            const response = await fetch(apiUrl, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ base64: file.base64, prompt }) 
-            });
-            // ^^^ --- КОНЕЦ ИЗМЕНЕНИЯ --- ^^^
-
+            const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ base64: file.base64, prompt }) });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Backend request failed');
 
             if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
                 const textResult = result.candidates[0].content.parts[0].text;
-                let finalAnalysis: Partial<AnalysisResult> = { [type]: textResult };
+                let finalAnalysis: Partial<AnalysisResult> = { [type]: textResult, error: undefined };
                 if (type === 'similarQuery') {
                     finalAnalysis.similarQueryLink = `https://unsplash.com/s/photos/${encodeURIComponent(textResult.trim())}`;
                 }
@@ -235,19 +231,18 @@ const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<Rea
             }
         } catch (error: any) {
              updateFileAnalysis(file.id, { [type]: undefined, error: error.message });
+        } finally {
+            setIsAnalyzing(prev => ({ ...prev, [type]: false }));
         }
     };
     
-    const isAnalyzing = (type: keyof AnalysisResult) => file.analysis[type] === 'Analyzing...';
-    
     const analysisOptions = [
-        { type: 'description' as const, icon: Bot, title: 'Describe Scene', prompt: "Describe this image in detail for a movie scene. IMPORTANT: Do not include any introductory phrases or scene headings like 'EXT. ROAD - NIGHT'. Just provide the raw description of the scene itself.", description: 'Generate a detailed, cinematic scene description.' },
-        { type: 'altText' as const, icon: TextCursorInput, title: 'Create Alt Text', prompt: "Write a concise and descriptive alt text for this image. IMPORTANT: Do not include any introductory phrases like 'Here's the alt text:'. Just provide the alt text directly.", description: 'Create accessible alt text for screen readers.' },
-        { type: 'similarQuery' as const, icon: Search, title: 'Find Similar', prompt: "Based on this image's content, create a concise search query to find similar stock photos. Return only the query text, without any extra formatting or quotation marks.", description: 'Get a search query to find similar photos.' },
-    ];
+        { type: 'description', icon: Bot, title: 'Describe Scene', prompt: "Describe this image in detail for a movie scene. IMPORTANT: Do not include any introductory phrases or scene headings like 'EXT. ROAD - NIGHT'. Just provide the raw description of the scene itself.", description: 'Generate a detailed, cinematic scene description.' },
+        { type: 'altText', icon: TextCursorInput, title: 'Create Alt Text', prompt: "Write a concise and descriptive alt text for this image. IMPORTANT: Do not include any introductory phrases like 'Here's the alt text:'. Just provide the alt text directly.", description: 'Create accessible alt text for screen readers.' },
+        { type: 'similarQuery', icon: Search, title: 'Find Similar', prompt: "Based on this image's content, create a concise search query to find similar stock photos. Return only the query text, without any extra formatting or quotation marks.", description: 'Get a search query to find similar photos.' },
+    ] as const;
 
-    const hasAnyAnalysisStarted = Object.values(file.analysis).some(v => v && v !== 'Analyzing...');
-    const isAnyAnalysisRunning = Object.values(file.analysis).some(v => v === 'Analyzing...');
+    const hasAnyAnalysisStarted = Object.values(file.analysis).some(v => v);
 
     return (
         <div className="max-w-4xl mx-auto animate-fade-in-up">
@@ -267,7 +262,7 @@ const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<Rea
                 </CardHeader>
                 <CardContent className="p-6">
                     <CardTitle className="text-2xl mb-4">{file.name}</CardTitle>
-                    {!hasAnyAnalysisStarted && !isAnyAnalysisRunning ? (
+                    {!hasAnyAnalysisStarted ? (
                          <Card className="bg-slate-50 dark:bg-slate-800/50">
                             <CardHeader>
                                 <CardTitle>Start Your Analysis</CardTitle>
@@ -286,18 +281,18 @@ const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<Rea
                             </CardContent>
                         </Card>
                     ) : (
-                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as AnalysisType)} className="w-full">
                         <TabsList className="grid w-full grid-cols-3">
                             {analysisOptions.map(opt => (
-                                <TabsTrigger key={opt.type} value={opt.type} disabled={isAnalyzing(opt.type)} onClick={() => callBackendApi(opt.type, opt.prompt)}>
-                                    {isAnalyzing(opt.type) ? <Spinner/> : <><opt.icon className="h-4 w-4 mr-2"/>{opt.title}</>}
+                                <TabsTrigger key={opt.type} value={opt.type} disabled={isAnalyzing[opt.type]} onClick={() => callBackendApi(opt.type, opt.prompt)}>
+                                    {isAnalyzing[opt.type] ? <Spinner/> : <><opt.icon className="h-4 w-4 mr-2"/>{opt.title}</>}
                                 </TabsTrigger>
                             ))}
                         </TabsList>
                         <div className="mt-4 p-4 bg-slate-100 dark:bg-slate-900 rounded-md min-h-[150px] text-sm text-slate-800 dark:text-slate-200 prose dark:prose-invert">
-                           <AnalysisContent active={activeTab === 'description'} isLoading={isAnalyzing('description')} content={file.analysis.description} placeholder="Click 'Describe' tab to generate a detailed description." />
-                           <AnalysisContent active={activeTab === 'altText'} isLoading={isAnalyzing('altText')} content={file.analysis.altText} placeholder="Click 'Alt Text' tab to generate a descriptive alt text." />
-                           <AnalysisContent active={activeTab === 'similarQuery'} isLoading={isAnalyzing('similarQuery')} content={file.analysis.similarQuery} placeholder="Click 'Find Similar' tab to generate a search query." link={file.analysis.similarQueryLink}/>
+                           <AnalysisContent active={activeTab === 'description'} isLoading={isAnalyzing.description} content={file.analysis.description} placeholder="Click 'Describe' tab to generate a detailed description." />
+                           <AnalysisContent active={activeTab === 'altText'} isLoading={isAnalyzing.altText} content={file.analysis.altText} placeholder="Click 'Alt Text' tab to generate a descriptive alt text." />
+                           <AnalysisContent active={activeTab === 'similarQuery'} isLoading={isAnalyzing.similarQuery} content={file.analysis.similarQuery} placeholder="Click 'Find Similar' tab to generate a search query." link={file.analysis.similarQueryLink}/>
                            {file.analysis.error && <p className="text-red-500 font-semibold">{file.analysis.error}</p>}
                         </div>
                     </Tabs>
@@ -308,7 +303,7 @@ const AnalysisPanel: React.FC<{file: ProcessedFile, setFiles: React.Dispatch<Rea
     );
 }
 
-const AnalysisContent: React.FC<{active: boolean, isLoading: boolean, content?: string, placeholder: string, link?: string}> = ({ active, isLoading, content, placeholder, link }) => {
+const AnalysisContent: React.FC<{active: boolean, isLoading?: boolean, content?: string, placeholder: string, link?: string}> = ({ active, isLoading, content, placeholder, link }) => {
     if (!active) return null;
     if (isLoading) return <div className="flex justify-center items-center h-full"><Spinner /></div>;
     
@@ -337,9 +332,10 @@ interface MobileLayoutProps {
     processFiles: (files: FileList) => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
     router: ReturnType<typeof useRouter>; 
+    setFiles: React.Dispatch<React.SetStateAction<ProcessedFile[]>>;
 }
 
-const MobileLayout: React.FC<MobileLayoutProps> = ({ files, removeFile, selectedFile, setSelectedFileId, processFiles, fileInputRef, router }) => (
+const MobileLayout: React.FC<MobileLayoutProps> = ({ files, removeFile, selectedFile, setSelectedFileId, processFiles, fileInputRef, router, setFiles }) => (
     <div className="p-4">
         <header className="fixed top-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-20 px-4 py-2 flex justify-between items-center border-b dark:border-slate-800">
             <div className="flex items-center gap-2">
@@ -362,7 +358,7 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({ files, removeFile, selected
                 </div>
             ) : null}
 
-            {selectedFile ? <AnalysisPanel file={selectedFile} setFiles={() => {}} /> : <div className="text-center p-8 border-2 border-dashed rounded-lg" onClick={() => fileInputRef.current?.click()}><EmptyState onClick={() => fileInputRef.current?.click()}/></div>}
+            {selectedFile ? <AnalysisPanel file={selectedFile} setFiles={setFiles} /> : <div className="text-center p-8 border-2 border-dashed rounded-lg" onClick={() => fileInputRef.current?.click()}><EmptyState onClick={() => fileInputRef.current?.click()}/></div>}
              <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(e) => e.target.files && processFiles(e.target.files)} />
         </div>
     </div>
