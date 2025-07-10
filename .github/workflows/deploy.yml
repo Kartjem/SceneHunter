@@ -25,6 +25,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: 'google-github-actions/auth@v2'
         with:
+          # VVV --- ИЗМЕНЕНИЕ ЗДЕСЬ: Вставлен правильный номер проекта --- VVV
           workload_identity_provider: 'projects/233532216462/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-deployer@scenehunter-29ff8.iam.gserviceaccount.com'
 
@@ -38,7 +39,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # 5. Создаем .env файл для сборки, используя секреты
+      # 5. Создаем .env файл для сборки
       - name: Create .env file
         run: |
           echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> .env
@@ -59,6 +60,4 @@ jobs:
 
       # 8. Деплоим в Firebase
       - name: Deploy to Firebase Hosting
-        run: firebase deploy --only hosting --project scenehunter-29ff8 --token "$FIREBASE_TOKEN"
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: firebase deploy --only hosting --project scenehunter-29ff8
