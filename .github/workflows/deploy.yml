@@ -1,44 +1,51 @@
-name: Deploy to Firebase Hosting on push to main
+# Имя рабочего процесса
+name: Deploy to Firebase Hosting on Push to Main
 
+# Условие запуска: при любом пуше в ветку 'main'
 on:
   push:
     branches:
       - main
 
+# Задачи, которые нужно выполнить
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Запускаем на виртуальной машине с Ubuntu
     steps:
-      - name: Checkout code
+      # 1. Клонируем репозиторий
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 2. Устанавливаем Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      # 3. Устанавливаем зависимости
+      - name: Install Dependencies
         run: npm install
 
-      # Создаем .env.local файл прямо на сервере GitHub Actions
-      - name: Create .env.local file
+      # 4. Создаем .env файл для сборки, используя секреты
+      - name: Create .env file
         run: |
-          echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" >> .env.local
-          echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
 
-      # Собираем проект Next.js
-      - name: Build project
+      # 5. Собираем проект
+      - name: Build Project
         run: npm run build
 
-      # Деплоим в Firebase
+      # 6. Деплоим в Firebase, используя CI токен
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          token: '${{ secrets.FIREBASE_TOKEN }}' # Или этот
-          channelId: live
+          firebaseServiceAccount: '' # <-- Оставляем это поле пустым
+          token: '${{ secrets.FIREBASE_TOKEN }}' # <-- Используем наш новый токен
           projectId: scenehunter-29ff8
