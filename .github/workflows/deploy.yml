@@ -10,23 +10,35 @@ on:
 # Задачи, которые нужно выполнить
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest # Запускаем на виртуальной машине с Ubuntu
+    runs-on: ubuntu-latest
+    # VVV --- ВАЖНО: Добавляем права для получения токена аутентификации --- VVV
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       # 1. Клонируем репозиторий
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Устанавливаем Node.js
+      # 2. Аутентифицируемся в Google Cloud без ключа
+      - name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/233532216462/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-deployer@scenehunter-29ff8.iam.gserviceaccount.com'
+
+      # 3. Устанавливаем Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # 3. Устанавливаем зависимости
+      # 4. Устанавливаем зависимости
       - name: Install Dependencies
         run: npm install
 
-      # 4. Создаем .env файл для сборки, используя секреты
+      # 5. Создаем .env файл для сборки, используя секреты
       - name: Create .env file
         run: |
           echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> .env
@@ -36,16 +48,17 @@ jobs:
           echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" >> .env
           echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> .env
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+      
+      # 6. Устанавливаем Firebase CLI
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
-      # 5. Собираем проект
+      # 7. Собираем проект
       - name: Build Project
         run: npm run build
 
-      # 6. Деплоим в Firebase, используя CI токен
+      # 8. Деплоим в Firebase
       - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '' # <-- Оставляем это поле пустым
-          token: '${{ secrets.FIREBASE_TOKEN }}' # <-- Используем наш новый токен
-          projectId: scenehunter-29ff8
+        run: firebase deploy --only hosting --project scenehunter-29ff8 --token "$FIREBASE_TOKEN"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
