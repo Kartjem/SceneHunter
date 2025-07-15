@@ -41,7 +41,7 @@ export const nextjsFunc = functions.https.onRequest(async (req, res) => {
 
       const mimeType = base64.substring(base64.indexOf(":") + 1, base64.indexOf(";"));
       const pureBase64 = base64.split(',')[1];
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
       const geminiResponse = await fetch(apiUrl, {
         method: 'POST',
